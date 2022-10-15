@@ -21,10 +21,10 @@ class ControlDB:
         return False
 
     def create_table(self):
-        new_table = '''
+        table = '''
                     CREATE TABLE persons
                     (
-                    person_id serial not null,
+                    id serial not null,
                        name varchar,
                        address varchar,
                        work varchar,
@@ -33,7 +33,7 @@ class ControlDB:
                     '''
         connection = psycopg2.connect(self.DB_URL, sslmode="require")
         cursor = connection.cursor()
-        cursor.execute(new_table)
+        cursor.execute(table)
         connection.commit()
         cursor.close()
         connection.close()
