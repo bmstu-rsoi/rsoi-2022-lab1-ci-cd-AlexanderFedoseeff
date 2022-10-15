@@ -1,11 +1,14 @@
+import os
 from control_db import ControlDB
-
 from flask import Flask, jsonify
 from flask import abort
 from flask import make_response
 from flask import request
 from curses.ascii import NUL
 
+port = os.environ.get('PORT')
+if port is None:
+    port = 80
 
 app = Flask(__name__)
 
@@ -91,4 +94,4 @@ def delete_person(person_id):
     return jsonify({}), 204
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=True, port="80")
+    app.run(host="0.0.0.0", debug=True, port=int(port))
