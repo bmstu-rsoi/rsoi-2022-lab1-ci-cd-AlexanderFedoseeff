@@ -16,7 +16,17 @@ jobs:
           fetch-depth: 0
 
       # TODO build, test and deploy project
+      - name: Deploy project
+        uses: akhileshns/heroku-deploy@v3.4.6
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "rsoi-lab-1-f"
+          heroku_email: "alexanderfedoseeff@gmail.com"
+          usedocker: true
 
+      - name: Sleep for 25 seconds
+        run: sleep 25s
+        shell: bash
       - name: Run API Tests
         uses: matt-ball/newman-action@master
         with:
