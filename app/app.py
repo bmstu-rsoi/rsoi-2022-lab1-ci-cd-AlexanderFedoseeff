@@ -1,117 +1,25 @@
-import psycopg2
-from psycopg2 import Error
+from control_db import ControlDB
+
 from flask import Flask, jsonify
 from flask import abort
 from flask import make_response
 from flask import request
 from curses.ascii import NUL
 
-user_db="program"
-password_db="test"
-host_db="0.0.0.0"
-port_db="5432"
-database_db="persons"
 
 app = Flask(__name__)
 
-print("start")
-
-def get_persons_db():
-    result = list()
-    try:
-        connection = psycopg2.connect(user=user_db, 
-            password=password_db, 
-            host=host_db, 
-            port=port_db, 
-            database=database_db)
-        cursor = connection.cursor()
-        cursor.execute("SELECT * from persons")
-        record = cursor.fetchall()
-        for i in record:
-            i = list(i)
-            result.append({"id": i[0], "name": i[1], "age": i[2], "address": i[3], "work": i[4]})
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
-            print("Соединение с PostgreSQL закрыто")
-    return result
-
-def create_person_db(id, person_name, age, address, work):
-    record = list()
-    try:
-        connection = psycopg2.connect(user=user_db, 
-            password=password_db, 
-            host=host_db, 
-            port=port_db, 
-            database=database_db)
-        cursor = connection.cursor()
-        insert_query = """ INSERT INTO persons (id, name, age, address, work) VALUES (%s, %s, %s, %s, %s) """
-        cursor.execute(insert_query, (id, person_name, age, address, work))
-        connection.commit()
-        print("запись успешно вставлена")
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
-            print("Соединение с PostgreSQL закрыто")
-    return record
-
-def update_person_db(person):
-    try:
-        connection = psycopg2.connect(user=user_db, 
-            password=password_db, 
-            host=host_db, 
-            port=port_db, 
-            database=database_db)
-        cursor = connection.cursor()
-        insert_query = """ UPDATE persons SET name = %s, age = %s, address = %s, work = %s WHERE id = %s"""
-        cursor.execute(insert_query, (person['name'], person['age'], person['address'], person['work'], person['id']))
-        connection.commit()
-        print("запись успешно обновленаа")
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
-            print("Соединение с PostgreSQL закрыто")
-
-def delete_person_db(person_id):
-    result = False
-    try:
-        connection = psycopg2.connect(user=user_db, 
-            password=password_db, 
-            host=host_db, 
-            port=port_db, 
-            database=database_db)
-        cursor = connection.cursor()
-        insert_query = """ DELETE FROM persons WHERE id = '%s' """
-        cursor.execute(insert_query, (person_id))
-        connection.commit()
-        result = True
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
-            print("Соединение с PostgreSQL закрыто")
-        return result
-
 @app.route('/api/v1.0/persons', methods=['GET'])
 def get_persons():
-    print(get_persons_db())
-    return make_response(jsonify({'persons': get_persons_db()}), 200)
+    db = ControlDB()
+    print(db.get_persons())
+    return make_response(jsonify({'persons': db.get_persons()}), 200)
 
 
 @app.route('/api/v1.0/persons/<int:person_id>', methods=['GET'])
 def get_person(person_id):
-    persons = get_persons_db()
+    db = ControlDB()
+    persons = db.get_persons()
     person = list(filter(lambda t: t['id'] == person_id, persons))
     if len(person) == 0:
         abort(404)
@@ -123,7 +31,8 @@ def not_found(error):
 
 @app.route('/api/v1.0/persons', methods=['POST'])
 def create_person():
-    persons = get_persons_db()
+    db = ControlDB()
+    persons = db.get_persons()
     if not request.json or not 'id' in request.json:
         abort(400)
     if len(persons) == 0:
@@ -141,7 +50,7 @@ def create_person():
         'address': request.json['address'],
         'work': request.json['work']
     }
-    create_person_db(person_id, request.json['name'], request.json['age'], request.json['address'], request.json['work'])
+    db.create_person(person_id, request.json['name'], request.json['age'], request.json['address'], request.json['work'])
     persons.append(person)
     return jsonify({}), 201, {"Location": "/api/v1/persons/" + str(person_id)}
 
@@ -149,8 +58,9 @@ def create_person():
 def update_person():
     if not request.json or not 'id' in request.json:
         abort(400)
+    db = ControlDB()
     person_id = request.json['id']
-    persons = get_persons_db()
+    persons = db.get_persons()
     for p, person in enumerate(persons):
         if persons[p]['id'] == person_id:
             target_person = person
@@ -164,16 +74,17 @@ def update_person():
         'address': request.json['address'],
         'work': request.json['work']
     }
-    update_person_db(person)
+    db.update_person(person)
     return jsonify({}), 200
 
 @app.route('/api/v1.0/persons/<int:person_id>', methods=['DELETE'])
 def delete_person(person_id):
-    persons = get_persons_db()
+    db = ControlDB()
+    persons = db.get_persons()
     for p, person in enumerate(persons):
         if persons[p]['id'] == person_id:
             print("i have found")
-            delete_person_db([person_id])
+            db.delete_person([person_id])
             break
         if (len(persons)) - 1 == p:
             abort(404)

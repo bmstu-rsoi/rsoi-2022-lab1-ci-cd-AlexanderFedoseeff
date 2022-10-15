@@ -4,11 +4,10 @@ from psycopg2 import Error
 class ControlDB:
     def __init__(self):
         self.DB_URL = "postgres://cypubjqljpvvrt:932ead6c14327f40eb1b43bb285b7c76dbfaa929c99b6ae25f7b8915f0ac301d@ec2-52-49-201-212.eu-west-1.compute.amazonaws.com:5432/d3spo9noe4jbtd"
-
-        if not self.check_persons_tabele():
+        if not self.check_existing_persons_table():
             self.create_table()
 
-    def check_persons_tabele(self):
+    def check_existing_persons_table(self):
         connection = psycopg2.connect(self.DB_URL, sslmode="require")
         cursor = connection.cursor()
         cursor.execute("""SELECT table_name FROM information_schema.tables
@@ -18,7 +17,7 @@ class ControlDB:
                 cursor.close()
                 return True
         cursor.close()
-        cursor.close()
+        connection.close()
         return False
 
     def create_table(self):
