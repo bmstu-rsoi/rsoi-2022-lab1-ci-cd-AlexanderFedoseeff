@@ -20,7 +20,7 @@ def get_test():
 def get_persons():
     db = ControlDB()
     print(db.get_persons())
-    return make_response(jsonify({'persons': db.get_persons()}), 200)
+    return make_response(jsonify(db.get_persons()), 200)
 
 
 @app.route('/api/v1/persons/<int:person_id>', methods=['GET'])
@@ -82,7 +82,7 @@ def update_person(person_id):
     if 'work' in request_data:
         person_updated['work'] = request.json['work']
     db.update_person(person_updated)
-    return jsonify({}), 200
+    return jsonify(person_updated), 200
 
 @app.route('/api/v1/persons/<int:person_id>', methods=['DELETE'])
 def delete_person(person_id):
