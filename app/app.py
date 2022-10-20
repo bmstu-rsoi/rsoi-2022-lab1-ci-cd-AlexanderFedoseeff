@@ -42,15 +42,22 @@ def create_person():
     persons = db.get_persons()
     if not request.json:
         abort(400)
+    person_id = 0
     if len(persons) == 0:
         person_id = 1
     else:
-        person_id = 0
         for p in persons:
             if p['id'] > person_id:
                 person_id = p['id']
         person_id = person_id + 1
-    db.create_person(person_id, request.json['name'], request.json['age'], request.json['address'], request.json['work'])
+    person_created = {
+        'id': person_id,
+        'name': request.json['name'],
+        'age': request.json['age'],
+        'address': request.json['address'],
+        'work': request.json['work']
+    }
+    db.create_person(person_created)
     return jsonify({}), 201, {"Location": "/api/v1/persons/" + str(person_id)}
 
 @app.route('/api/v1/persons/<int:person_id>', methods=['PATCH'])
@@ -62,14 +69,14 @@ def update_person(person_id):
     person = list(filter(lambda t: t['id'] == person_id, persons))
     if len(person) == 0:
         abort(404)
-    person = {
+    person_updated = {
         'id': person_id,
         'name': request.json['name'],
         'age': request.json['age'],
         'address': request.json['address'],
         'work': request.json['work']
     }
-    db.update_person(person)
+    db.update_person(person_updated)
     return jsonify({}), 200
 
 @app.route('/api/v1/persons/<int:person_id>', methods=['DELETE'])

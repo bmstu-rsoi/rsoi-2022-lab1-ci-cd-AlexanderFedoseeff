@@ -43,11 +43,11 @@ class ControlDB:
         try:
             connection = psycopg2.connect(self.DB_URL, sslmode="require")
             cursor = connection.cursor()
-            cursor.execute("SELECT * from persons")
+            cursor.execute("SELECT id, name, address, work, age FROM persons")
             record = cursor.fetchall()
             for i in record:
                 i = list(i)
-                result.append({"id": i[0], "name": i[1], "age": i[2], "address": i[3], "work": i[4]})
+                result.append({"id": i[0], "name": i[1], "address": i[2], "work": i[3], "age": i[4]})
         except (Exception, Error) as error:
             print("Ошибка при работе с PostgreSQL", error)
         finally:
@@ -57,13 +57,13 @@ class ControlDB:
                 print("Соединение с PostgreSQL закрыто")
         return result
 
-    def create_person(self, id, person_name, age, address, work):
+    def create_person(self, person_created):
         result = False
         try:
             connection = psycopg2.connect(self.DB_URL, sslmode="require")
             cursor = connection.cursor()
             insert_query = """ INSERT INTO persons (id, name, age, address, work) VALUES (%s, %s, %s, %s, %s) """
-            cursor.execute(insert_query, (id, person_name, age, address, work))
+            cursor.execute(insert_query, (person_created['id'], person_created['name'], person_created['age'], person_created['address'], person_created['work']))
             connection.commit()
             result = True
             print("запись успешно вставлена")
