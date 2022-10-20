@@ -12,18 +12,18 @@ if port is None:
 
 app = Flask(__name__)
 
-@app.route('/api/v1.0/test', methods=['GET'])
+@app.route('/api/v1/test', methods=['GET'])
 def get_test():
     return make_response(jsonify({'test': 'ok', 'port': port}), 200)
 
-@app.route('/api/v1.0/persons', methods=['GET'])
+@app.route('/api/v1/persons', methods=['GET'])
 def get_persons():
     db = ControlDB()
     print(db.get_persons())
     return make_response(jsonify({'persons': db.get_persons()}), 200)
 
 
-@app.route('/api/v1.0/persons/<int:person_id>', methods=['GET'])
+@app.route('/api/v1/persons/<int:person_id>', methods=['GET'])
 def get_person(person_id):
     db = ControlDB()
     persons = db.get_persons()
@@ -36,7 +36,7 @@ def get_person(person_id):
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
-@app.route('/api/v1.0/persons', methods=['POST'])
+@app.route('/api/v1/persons', methods=['POST'])
 def create_person():
     db = ControlDB()
     persons = db.get_persons()
@@ -61,7 +61,7 @@ def create_person():
     persons.append(person)
     return jsonify({}), 201, {"Location": "/api/v1/persons/" + str(person_id)}
 
-@app.route('/api/v1.0/persons', methods=['PATCH'])
+@app.route('/api/v1/persons', methods=['PATCH'])
 def update_person():
     if not request.json or not 'id' in request.json:
         abort(400)
@@ -84,7 +84,7 @@ def update_person():
     db.update_person(person)
     return jsonify({}), 200
 
-@app.route('/api/v1.0/persons/<int:person_id>', methods=['DELETE'])
+@app.route('/api/v1/persons/<int:person_id>', methods=['DELETE'])
 def delete_person(person_id):
     db = ControlDB()
     persons = db.get_persons()
