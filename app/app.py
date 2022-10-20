@@ -81,8 +81,13 @@ def update_person(person_id):
         person_updated['address'] = request.json['address']
     if 'work' in request_data:
         person_updated['work'] = request.json['work']
-    db.update_person(person_updated)
-    return jsonify(person_updated), 200
+    if db.update_person(person_updated):
+        updated_person = list(filter(lambda t: t['id'] == person_id, persons))
+        if len(updated_person) == 0:
+            abort(404)
+        return make_response(jsonify(updated_person[0]), 200)
+    else:
+        abort(404)
 
 @app.route('/api/v1/persons/<int:person_id>', methods=['DELETE'])
 def delete_person(person_id):
