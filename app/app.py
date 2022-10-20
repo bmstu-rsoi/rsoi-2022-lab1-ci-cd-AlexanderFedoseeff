@@ -82,7 +82,8 @@ def update_person(person_id):
     if 'work' in request_data:
         person_updated['work'] = request.json['work']
     if db.update_person(person_updated):
-        updated_person = list(filter(lambda t: t['id'] == person_id, persons))
+        persons_updateted = db.get_persons()
+        updated_person = list(filter(lambda t: t['id'] == person_id, persons_updateted))
         if len(updated_person) == 0:
             abort(404)
         return make_response(jsonify(updated_person[0]), 200)
