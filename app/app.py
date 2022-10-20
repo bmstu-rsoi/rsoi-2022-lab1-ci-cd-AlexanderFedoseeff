@@ -40,7 +40,7 @@ def not_found(error):
 def create_person():
     db = ControlDB()
     persons = db.get_persons()
-    if not request.json or not 'id' in request.json:
+    if not request.json:
         abort(400)
     if len(persons) == 0:
         person_id = 1
@@ -50,15 +50,7 @@ def create_person():
             if p['id'] > person_id:
                 person_id = p['id']
         person_id = person_id + 1
-    person = {
-        'id': person_id,
-        'name': request.json['name'],
-        'age': request.json['age'],
-        'address': request.json['address'],
-        'work': request.json['work']
-    }
     db.create_person(person_id, request.json['name'], request.json['age'], request.json['address'], request.json['work'])
-    persons.append(person)
     return jsonify({}), 201, {"Location": "/api/v1/persons/" + str(person_id)}
 
 @app.route('/api/v1/persons', methods=['PATCH'])
