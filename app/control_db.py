@@ -28,7 +28,7 @@ class ControlDB:
                        name varchar,
                        address varchar,
                        work varchar,
-                       age varchar
+                       age int
                     );
                     '''
         connection = psycopg2.connect(self.DB_URL, sslmode="require")
