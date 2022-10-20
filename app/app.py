@@ -53,21 +53,17 @@ def create_person():
     db.create_person(person_id, request.json['name'], request.json['age'], request.json['address'], request.json['work'])
     return jsonify({}), 201, {"Location": "/api/v1/persons/" + str(person_id)}
 
-@app.route('/api/v1/persons', methods=['PATCH'])
-def update_person():
-    if not request.json or not 'id' in request.json:
+@app.route('/api/v1/persons/<int:person_id>', methods=['PATCH'])
+def update_person(person_id):
+    if not request.json:
         abort(400)
     db = ControlDB()
-    person_id = request.json['id']
     persons = db.get_persons()
-    for p, person in enumerate(persons):
-        if persons[p]['id'] == person_id:
-            target_person = person
-            break
-        if (len(persons)) - 1 == p:
-            abort(404)
+    person = list(filter(lambda t: t['id'] == person_id, persons))
+    if len(person) == 0:
+        abort(404)
     person = {
-        'id': request.json['id'],
+        'id': person_id,
         'name': request.json['name'],
         'age': request.json['age'],
         'address': request.json['address'],
