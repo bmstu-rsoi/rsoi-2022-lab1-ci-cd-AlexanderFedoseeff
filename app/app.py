@@ -8,7 +8,7 @@ from curses.ascii import NUL
 
 port = os.environ.get('PORT')
 if port is None:
-    port = 8080
+    port = 80
 
 app = Flask(__name__)
 
