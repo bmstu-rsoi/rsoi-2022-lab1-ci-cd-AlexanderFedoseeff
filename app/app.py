@@ -12,6 +12,12 @@ if port is None:
 
 app = Flask(__name__)
 
+@app.route('/api/v1.0/test', methods=['GET'])
+def get_persons():
+    db = ControlDB()
+    print(db.get_persons())
+    return make_response(jsonify({'test': 'ok', 'port': port}), 200)
+
 @app.route('/api/v1.0/persons', methods=['GET'])
 def get_persons():
     db = ControlDB()
