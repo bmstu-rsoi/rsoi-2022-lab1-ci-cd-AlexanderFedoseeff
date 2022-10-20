@@ -8,7 +8,7 @@ from curses.ascii import NUL
 
 port = os.environ.get('PORT')
 if port is None:
-    port = 80
+    port = 8080
 
 app = Flask(__name__)
 
@@ -70,12 +70,17 @@ def update_person(person_id):
     if len(person) == 0:
         abort(404)
     person_updated = {
-        'id': person_id,
-        'name': request.json['name'],
-        'age': request.json['age'],
-        'address': request.json['address'],
-        'work': request.json['work']
+        'id': person_id
     }
+    request_data = request.get_json()
+    if 'name' in request_data:
+        person_updated['name'] = request.json['name']
+    if 'age' in request_data:
+        person_updated['age'] = request.json['age']
+    if 'address' in request_data:
+        person_updated['address'] = request.json['address']
+    if 'work' in request_data:
+        person_updated['work'] = request.json['work']
     db.update_person(person_updated)
     return jsonify({}), 200
 

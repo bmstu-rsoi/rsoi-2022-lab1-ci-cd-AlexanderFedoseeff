@@ -76,13 +76,23 @@ class ControlDB:
                 print("Соединение с PostgreSQL закрыто")
         return result
 
-    def update_person(self, person):
+    def update_person(self, person_updated):
         result = False
         try:
             connection = psycopg2.connect(self.DB_URL, sslmode="require")
             cursor = connection.cursor()
-            insert_query = """ UPDATE persons SET name = %s, age = %s, address = %s, work = %s WHERE id = %s"""
-            cursor.execute(insert_query, (person['name'], person['age'], person['address'], person['work'], person['id']))
+            if 'name' in person_updated:
+                insert_query = """ UPDATE persons SET name = %s WHERE id = %s"""
+                cursor.execute(insert_query, (person_updated['name'], person_updated['id']))
+            if 'age' in person_updated:
+                insert_query = """ UPDATE persons SET age = %s WHERE id = %s"""
+                cursor.execute(insert_query, (person_updated['age'], person_updated['id']))
+            if 'address' in person_updated:
+                insert_query = """ UPDATE persons SET address = %s WHERE id = %s"""
+                cursor.execute(insert_query, (person_updated['address'], person_updated['id']))
+            if 'work' in person_updated:
+                insert_query = """ UPDATE persons SET work = %s WHERE id = %s"""
+                cursor.execute(insert_query, (person_updated['work'], person_updated['id']))
             connection.commit()
             result = True
             print("запись успешно обновленаа")
